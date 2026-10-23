@@ -229,7 +229,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <p>Isi halaman ini tidak terkirim otomatis dan tidak disimpan ke server. Kalau kamu ingin seseorang membacanya, kamu bisa menyalin atau mengirimkannya sendiri.</p>
     <label for="finalStory">Cerita yang kamu tulis</label>
     <textarea id="finalStory" placeholder="Cerita yang kamu tulis akan muncul di sini..." readonly></textarea>
-    <button class="btn btn-wa" id="whatsapp"><svg class="i"><use href="#i-msg"/></svg>Kirim ceritaku ke WhatsApp</button>
+    <button class="btn btn-wa" id="whatsapp" type="button"><svg class="i"><use href="#i-msg"/></svg>Kirim ceritaku ke WhatsApp</button>
+    <p class="small">Jika WhatsApp tidak terbuka, salin cerita di atas lalu tempelkan ke chat WhatsApp.</p>
   </div>
   <div class="note">
     <svg class="i"><use href="#i-sprout"/></svg>
@@ -313,16 +314,31 @@ function finish(){
  show("ending");
 }
 
-$("copy").onclick=async()=>{
- try{await navigator.clipboard.writeText($("finalStory").value);$("copyStatus").textContent="Tersalin. Kamu bisa menempelkannya ke chat jika ingin membagikannya."}
- catch(e){$("finalStory").select();$("copyStatus").textContent="Pilih dan salin teks di atas secara manual."}
+$("restart").onclick=()=>{
+  stage=0;
+  selected=[];
+  nickname="";
+  $("nickname").value="";
+  $("finalStory").value="";
+  show("intro");
 };
-$("restart").onclick=()=>{stage=0;selected=[];$("copyStatus").textContent="";show("intro")};
-$("whatsapp").onclick=()=>{
- const nomor="628563147718";
- const pesan="Hai, aku ingin berbagi ceritaku lewat Ruang Cerita Gahta\n\n"+$("finalStory").value;
- window.open("https://wa.me/"+nomor+"?text="+encodeURIComponent(pesan),"_blank");
-};
+
+$("whatsapp").addEventListener("click",()=>{
+  const nomor="628563147718"; // Format internasional tanpa tanda + atau angka 0 di depan
+  const cerita=$("finalStory").value.trim();
+
+  if(!cerita || cerita==="Belum ada cerita yang ditulis. Tidak apa-apa, kamu tetap boleh istirahat."){
+    $("finalStory").focus();
+    alert("Belum ada cerita untuk dikirim. Kamu bisa kembali dan isi ceritamu terlebih dahulu.");
+    return;
+  }
+
+  const pesan="Hai, aku ingin berbagi ceritaku lewat Ruang Cerita Gahta.\n\n"+cerita;
+  const url="https://wa.me/"+nomor+"?text="+encodeURIComponent(pesan);
+
+  // Navigasi langsung dari klik pengguna untuk menghindari pemblokiran pop-up.
+  window.location.href=url;
+});
 </script>
 </body>
 </html>
